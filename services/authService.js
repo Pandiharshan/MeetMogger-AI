@@ -142,3 +142,25 @@ export const loginUser = async (credentials) => {
     };
   }
 };
+
+// Verify JWT token
+export const verifyToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+};
+
+// Get user by ID
+export const getUserById = async (userId) => {
+  try {
+    await connectDB();
+    const user = await User.findById(userId).select('-password');
+    return user;
+  } catch (error) {
+    console.error('Get user error:', error);
+    return null;
+  }
+};
