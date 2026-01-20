@@ -1,23 +1,9 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import type { AnalysisResult } from '../types';
-import { DEMO_MODE } from '../demo-config.js';
 
 // Initialize the Google Gemini API client.
-// The API key is sourced from Vite environment variables for browser compatibility.
-const getApiKey = (): string | null => {
-  const apiKey = import.meta.env.VITE_GEMINI_API_KEY;
-  if (!apiKey || apiKey === 'your_actual_gemini_api_key_here') {
-    return null;
-  }
-  return apiKey;
-};
-
-// Initialize AI client only if we have a valid API key
-let ai: GoogleGenAI | null = null;
-const apiKey = getApiKey();
-if (apiKey) {
-  ai = new GoogleGenAI({ apiKey });
-}
+// The API key is automatically sourced from the environment.
+const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
 
 // Define the exact JSON structure we expect from the Gemini API.
 // This ensures the AI's response is always in a predictable, parseable format.
@@ -80,14 +66,6 @@ const analysisSchema = {
 };
 
 export const analyzeCallTranscript = async (transcript: string): Promise<AnalysisResult> => {
-  // If no API key is available or we're in demo mode, use demo service
-  if (!ai || DEMO_MODE || !getApiKey()) {
-    console.log('🎭 Using demo Gemini service (no API key configured)');
-    // Import demo service dynamically to avoid issues
-    const { analyzeCallTranscript: demoAnalyze } = await import('./demoGeminiService.js');
-    return demoAnalyze(transcript);
-  }
-
   try {
     const prompt = `
       Analyze the following transcribed call conversation.
@@ -102,7 +80,7 @@ export const analyzeCallTranscript = async (transcript: string): Promise<Analysi
     `;
 
     const response = await ai.models.generateContent({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       contents: prompt,
       config: {
         responseMimeType: 'application/json',
@@ -122,10 +100,7 @@ export const analyzeCallTranscript = async (transcript: string): Promise<Analysi
 
   } catch (error) {
     console.error("Error analyzing transcript with Gemini API:", error);
-    console.log('🎭 Falling back to demo service due to API error');
-    
-    // Fallback to demo service if real API fails
-    const { analyzeCallTranscript: demoAnalyze } = await import('./demoGeminiService.js');
-    return demoAnalyze(transcript);
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred. Check the console for details.";
+    throw new Error(`Failed to get analysis from Gemini API. ${errorMessage}`);
   }
 };

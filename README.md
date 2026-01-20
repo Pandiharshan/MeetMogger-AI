@@ -4,262 +4,214 @@ A powerful AI-powered call transcript analysis tool that provides deep insights 
 
 ## 🌐 Live Demo
 
-**Frontend**: [https://meetmogger-ai.vercel.app](https://meetmogger-ai.vercel.app)  
-**Backend API**: [https://meetmogger-ai-backend.onrender.com](https://meetmogger-ai-backend.onrender.com)
+**Try it now!** [View Live Demo](https://pandiharshan.github.io/MeetMogger-AI/)
 
 **Demo Credentials:**
 - Email: `demo@meetmogger.ai`
 - Password: `demo123`
 
-*Note: The application supports both demo mode (mock data) and production mode (real backend).*
+*Note: The live demo uses mock data and doesn't require a backend server or API keys.*
 
 ## ✨ Features
 
-- **🔐 Secure Authentication**: JWT-based auth with bcrypt password hashing
-- **🛡️ Production Security**: CORS protection, input validation, rate limiting ready
+- **🔐 User Authentication**: Secure MongoDB-based user registration and login
 - **🎯 Theme Classification**: Automatically categorize calls by their primary topic
 - **😊 Sentiment Analysis**: Understand customer mood and tone
 - **📋 Actionable Extraction**: Extract problems, solutions, and action items
 - **🎨 Modern UI**: Beautiful, responsive interface with dark theme
 - **⚡ Real-time Analysis**: Instant AI-powered insights
-- **🚀 Cloud Ready**: Deployed on Render (backend) and Vercel (frontend)
 
 ## 🛠️ Tech Stack
 
-### Frontend
-- **React 19** with TypeScript
-- **Vite** for fast development
-- **Tailwind CSS** for styling
-- **Context API** for state management
-
-### Backend
-- **Node.js** with Express.js
-- **MongoDB** with Mongoose ODM
-- **JWT** authentication
-- **bcryptjs** for password hashing
-- **CORS** security configuration
-
-### AI & Services
-- **Google Gemini API** for text analysis
-- **MongoDB Atlas** for cloud database
-- **Render** for backend hosting
-- **Vercel** for frontend hosting
-
-## 🔐 Authentication System
-
-### Security Features
-- ✅ **JWT tokens** with 7-day expiration
-- ✅ **bcrypt password hashing** (12 salt rounds)
-- ✅ **CORS protection** with origin whitelist
-- ✅ **Input validation** and sanitization
-- ✅ **Protected routes** with middleware
-- ✅ **Token verification** on protected endpoints
-- ✅ **Secure logout** with token invalidation
-- ✅ **Environment variable protection**
-
-### Authentication Flow
-1. **Registration**: User creates account → Password hashed → JWT issued
-2. **Login**: Credentials verified → JWT token returned
-3. **Protected Access**: Token sent in Authorization header → Middleware validates
-4. **Logout**: Token invalidated → Local storage cleared
+- **Frontend**: React 19, TypeScript, Vite, Tailwind CSS
+- **Backend**: Node.js, Express.js
+- **Database**: MongoDB with Mongoose
+- **Authentication**: JWT tokens, bcryptjs
+- **AI**: Google Gemini API
+- **Styling**: Tailwind CSS with custom animations
 
 ## 📋 Prerequisites
 
+Before running this project, make sure you have:
+
 - **Node.js** (v18 or higher)
-- **MongoDB** (local or Atlas)
+- **MongoDB** (local installation or MongoDB Atlas)
 - **Google Gemini API Key**
+
+## 🎮 Demo Mode
+
+The application includes a **Demo Mode** that works without any backend setup:
+
+- **No MongoDB required** - Uses mock authentication
+- **No API keys needed** - Uses simulated AI responses
+- **Instant setup** - Just clone and run
+- **Full functionality** - Experience all features
+
+To enable demo mode, the application automatically detects when running on GitHub Pages and switches to demo mode.
 
 ## 🚀 Quick Start
 
-### 1. Clone Repository
+### 1. Clone the Repository
+
 ```bash
 git clone https://github.com/Pandiharshan/MeetMogger-AI.git
 cd MeetMogger-AI
 ```
 
 ### 2. Install Dependencies
+
 ```bash
 npm install
 ```
 
 ### 3. Environment Setup
-Copy `.env.example` to `.env` and configure:
+
+Create a `.env` file in the root directory:
 
 ```bash
-# Gemini AI API Key - Get from Google AI Studio
+# Gemini AI API Key
 GEMINI_API_KEY=your_actual_gemini_api_key_here
-VITE_GEMINI_API_KEY=your_actual_gemini_api_key_here
 
 # MongoDB Connection String
 MONGODB_URI=mongodb://localhost:27017/meetmogger-ai
 
-# JWT Secret - Generate with: node -e "console.log(require('crypto').randomBytes(32).toString('hex'))"
-JWT_SECRET=your-32-character-secret-key
+# JWT Secret for authentication
+JWT_SECRET=your-super-secret-jwt-key-change-this-in-production
 
-# Server Configuration
+# Server Port
 PORT=3001
-ALLOWED_ORIGINS=http://localhost:3000,http://localhost:5173
-
-# Frontend API URL (for production)
-VITE_API_BASE_URL=http://localhost:3001
 ```
 
-**🔑 Getting a Gemini API Key:**
-1. Go to [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Sign in with your Google account
-3. Click "Create API Key"
-4. Copy the key and replace `your_actual_gemini_api_key_here` in both `GEMINI_API_KEY` and `VITE_GEMINI_API_KEY`
+### 4. Start MongoDB
 
-**Note:** The app will work in demo mode without a real API key, but you'll get mock analysis results.
+**Option A: Local MongoDB**
+```bash
+# Make sure MongoDB service is running
+# On Windows: MongoDB should start automatically
+# On macOS: brew services start mongodb-community
+# On Linux: sudo systemctl start mongod
+```
 
-### 4. Start Development Servers
+**Option B: MongoDB Atlas**
+- Create a free account at [MongoDB Atlas](https://www.mongodb.com/atlas)
+- Create a cluster and get your connection string
+- Replace `MONGODB_URI` in `.env` with your Atlas connection string
 
-**Terminal 1 - Backend:**
+### 5. Run the Application
+
+**Terminal 1 - Start Backend Server:**
 ```bash
 npm run server
 ```
 
-**Terminal 2 - Frontend:**
+**Terminal 2 - Start Frontend:**
 ```bash
 npm run dev
 ```
 
-### 5. Access Application
-- **Frontend**: http://localhost:3000/MeetMogger-AI/
-- **Backend**: http://localhost:3001
+### 6. Access the Application
+
+- **Frontend**: http://localhost:3000
+- **Backend API**: http://localhost:3001
 - **Health Check**: http://localhost:3001/api/health
-
-## 🌐 Deployment
-
-### Backend (Render/Railway/Vercel)
-1. **Environment Variables**:
-   ```bash
-   MONGODB_URI=mongodb+srv://user:pass@cluster.mongodb.net/meetmogger-ai
-   JWT_SECRET=your-production-secret-32-chars-minimum
-   GEMINI_API_KEY=your-gemini-api-key
-   ALLOWED_ORIGINS=https://your-frontend-domain.com
-   NODE_ENV=production
-   ```
-
-2. **Deploy Commands**:
-   - **Build**: `npm install`
-   - **Start**: `npm start`
-
-### Frontend (Vercel/Netlify)
-1. **Environment Variables**:
-   ```bash
-   VITE_API_BASE_URL=https://your-backend-url.onrender.com
-   ```
-
-2. **Deploy Commands**:
-   - **Build**: `npm run build`
-   - **Output**: `dist/`
-
-See [DEPLOYMENT.md](DEPLOYMENT.md) for detailed deployment instructions.
 
 ## 📱 Usage
 
-### 1. Authentication
-- **Register**: Create new account with name, email, password
-- **Login**: Sign in with email and password
-- **Demo Mode**: Use `demo@meetmogger.ai` / `demo123`
+### 1. Create Account
+- Click "Get Started" on the homepage
+- Click "Don't have an account? Sign up"
+- Fill in your details and create an account
 
-### 2. Transcript Analysis
-- Paste call transcript in the input field
-- Click "Analyze" for AI-powered insights
-- View comprehensive analysis:
+### 2. Login
+- Use your credentials to sign in
+- You'll be redirected to the analysis page
+
+### 3. Analyze Call Transcripts
+- Paste your call transcript in the input field
+- Click "Analyze" to get AI-powered insights
+- View detailed analysis including:
   - Theme classification
   - Sentiment analysis
   - Problems and solutions
-  - Action items and summary
+  - Action items
+  - Summary
 
 ## 🔧 Available Scripts
 
 ```bash
 # Development
-npm run dev          # Start frontend (Vite)
-npm run server       # Start backend (Express)
+npm run dev          # Start frontend development server
+npm run server       # Start backend server
 npm run build        # Build for production
 npm run preview      # Preview production build
 
-# Testing
+# Database
 npm run test-mongodb # Test MongoDB connection
 ```
 
-## 🗄️ API Documentation
+## 🗄️ Database Schema
 
-### Authentication Endpoints
-```bash
-POST /api/auth/register
-Body: { name, email, password }
-Response: { success, message, user, token }
-
-POST /api/auth/login
-Body: { email, password }
-Response: { success, message, user, token }
-
-GET /api/auth/me (Protected)
-Headers: { Authorization: "Bearer <token>" }
-Response: { success, user }
-
-POST /api/auth/logout (Protected)
-Headers: { Authorization: "Bearer <token>" }
-Response: { success, message }
+### User Model
+```javascript
+{
+  email: String (unique, required)
+  password: String (hashed, required)
+  name: String (required)
+  createdAt: Date
+  updatedAt: Date
+}
 ```
+
+## 🔐 Authentication
+
+The application uses JWT tokens for authentication:
+- Tokens expire after 7 days
+- Passwords are hashed using bcryptjs
+- User sessions are stored in localStorage
+
+## 🌐 API Endpoints
+
+### Authentication
+- `POST /api/auth/register` - User registration
+- `POST /api/auth/login` - User login
 
 ### Health Check
-```bash
-GET /api/health
-Response: { status: "OK", message: "Server is running" }
-```
-
-## 🛡️ Security Features
-
-### Production Security
-- **CORS Protection**: Origin whitelist for cross-origin requests
-- **JWT Security**: Strong secrets, proper expiration
-- **Password Security**: bcrypt hashing with 12 salt rounds
-- **Input Validation**: Request body validation and sanitization
-- **Environment Security**: Sensitive data in environment variables
-- **HTTPS Ready**: Secure headers and protocols
-
-### Security Best Practices
-- No sensitive data in repository
-- Strong JWT secrets (32+ characters)
-- Secure MongoDB connection strings
-- Protected API endpoints
-- Token-based authentication
-- Proper error handling
+- `GET /api/health` - Server health status
 
 ## 🐛 Troubleshooting
 
-### Authentication Issues
-1. **Login Failed**: Check MongoDB connection and user credentials
-2. **Token Invalid**: Verify JWT_SECRET consistency between requests
-3. **CORS Error**: Ensure frontend domain in ALLOWED_ORIGINS
-4. **Protected Route 401**: Check Authorization header format: `Bearer <token>`
+### Common Issues
 
-### Deployment Issues
-1. **Backend 500 Error**: Check environment variables and MongoDB connection
-2. **Frontend API Error**: Verify VITE_API_BASE_URL points to deployed backend
-3. **Build Failures**: Ensure Node.js version 18+ and all dependencies installed
+**1. MongoDB Connection Error**
+```bash
+# Check if MongoDB is running
+# Windows: Check Services for "MongoDB"
+# macOS: brew services list | grep mongodb
+# Linux: sudo systemctl status mongod
+```
 
-### Database Issues
-1. **Connection Failed**: Check MONGODB_URI format and network access
-2. **Authentication Error**: Verify MongoDB credentials
-3. **Collection Not Found**: Database will auto-create on first user registration
+**2. Port Already in Use**
+```bash
+# Kill process using port 3001
+# Windows: netstat -ano | findstr :3001
+# macOS/Linux: lsof -ti:3001 | xargs kill -9
+```
+
+**3. Environment Variables Not Loading**
+- Make sure `.env` file is in the root directory
+- Restart both server and frontend after changing `.env`
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create feature branch: `git checkout -b feature-name`
+2. Create a feature branch: `git checkout -b feature-name`
 3. Commit changes: `git commit -m 'Add feature'`
 4. Push to branch: `git push origin feature-name`
-5. Submit pull request
+5. Submit a pull request
 
 ## 📄 License
 
-MIT License - see [LICENSE](LICENSE) file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
 ## 👥 Authors
 
@@ -269,10 +221,9 @@ MIT License - see [LICENSE](LICENSE) file for details.
 ## 🙏 Acknowledgments
 
 - Google Gemini AI for powerful language analysis
-- MongoDB Atlas for reliable cloud database
-- Render for backend hosting
-- Vercel for frontend hosting
-- React ecosystem for development tools
+- MongoDB for reliable data storage
+- React and Vite for the amazing development experience
+- Tailwind CSS for beautiful styling
 
 ---
 
