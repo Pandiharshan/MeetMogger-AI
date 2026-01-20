@@ -1,208 +1,185 @@
-# MeetMogger AI 🚀
+# MeetMogger AI
 
 **AI-Powered Call Transcript Analysis Platform**
 
-MeetMogger AI is a modern, AI-driven web application designed to analyze customer call transcripts and extract meaningful insights such as sentiment, themes, and actionable items. It helps teams better understand customer conversations and make data-driven decisions.
-
----
+MeetMogger AI is a full-stack web application that analyzes customer service call transcripts using artificial intelligence. The platform extracts key insights including sentiment analysis, conversation themes, identified problems, proposed solutions, and actionable next steps to help customer service teams improve their operations.
 
 ## 🌐 Live Demo
 
-🔗 **Live Demo (Demo Mode)**  
-https://pandiharshan.github.io/MeetMogger-AI/
+**Demo URL:** https://pandiharshan.github.io/MeetMogger-AI/
 
-**Demo Credentials**
+**Demo Credentials:**
 - Email: `demo@meetmogger.ai`
 - Password: `demo123`
 
-> **Note:**  
-> The GitHub Pages demo runs in **Demo Mode** using mock data.  
-> No backend server, database, or API keys are required.
+> **Note:** The live demo runs in demo mode using mock data and simulated AI responses. No backend server or API keys are required for the demo experience.
 
----
+## 📸 Screenshots
 
-## 🖼️ Screenshots
-
-_Add screenshots to visually showcase the application._
-
-```text
-/screenshots
-├── home.png
-├── login.png
-└── analysis.png
-```
-
+### Home Page
 ![Home Page](screenshots/home.png)
+
+### Login Page
 ![Login Page](screenshots/login.png)
+
+### Analysis Dashboard
 ![Analysis Dashboard](screenshots/analysis.png)
 
-## ✨ Key Features
+## ⚡ Key Features
 
-🔐 **User Authentication**  
-Secure JWT-based authentication with MongoDB
+- **User Authentication** - JWT-based secure login and registration system
+- **AI-Powered Analysis** - Automated transcript processing using Google Gemini AI
+- **Sentiment Detection** - Identifies customer emotions and conversation tone
+- **Theme Classification** - Categorizes calls by primary topic or issue type
+- **Problem Identification** - Extracts specific customer issues from conversations
+- **Solution Tracking** - Captures proposed solutions and resolutions
+- **Action Items** - Generates follow-up tasks and next steps
+- **Responsive Design** - Modern dark-themed interface optimized for all devices
 
-🎯 **Theme Classification**  
-Automatically categorizes call transcripts by primary topic
-
-😊 **Sentiment Analysis**  
-Detects customer mood and tone
-
-📋 **Actionable Insights**  
-Extracts problems, solutions, and action items
-
-🎨 **Modern UI**  
-Clean, responsive dark-themed interface
-
-⚡ **Real-Time Analysis**  
-Instant AI-powered transcript processing
-
-## 🛠️ Tech Stack
+## 🛠 Technology Stack
 
 **Frontend**
-- React 19
-- TypeScript
-- Vite
-- Tailwind CSS
+- React 19 with TypeScript
+- Vite for build tooling and development
+- Tailwind CSS for styling
+- Context API for state management
 
 **Backend**
-- Node.js
-- Express.js
-- MongoDB with Mongoose
-- JWT Authentication (bcryptjs)
+- Node.js with Express.js framework
+- MongoDB with Mongoose ODM
+- JWT authentication with bcrypt password hashing
+- RESTful API architecture
 
-**AI**
-- Google Gemini API
+**AI Integration**
+- Google Gemini API for natural language processing
+- Custom prompt engineering for structured analysis output
 
-## 🎮 Demo Mode
-
-MeetMogger AI includes a Demo Mode for easy preview:
-
-- No backend or database required
-- No API keys needed
-- Uses mock authentication and AI responses
-- Automatically enabled on GitHub Pages
-
-This mode allows anyone to explore the UI and features instantly.
+**Development & Deployment**
+- GitHub for version control
+- Vercel for frontend hosting
+- Environment-based configuration
 
 ## 🚀 Local Development Setup
 
-### 1. Clone the Repository
+### Prerequisites
+- Node.js (v16 or higher)
+- MongoDB (local installation or Atlas account)
+- Google Gemini API key
 
-```bash
-git clone https://github.com/Pandiharshan/MeetMogger-AI.git
-cd MeetMogger-AI
-```
+### Installation
 
-### 2. Install Dependencies
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/Pandiharshan/MeetMogger-AI.git
+   cd MeetMogger-AI
+   ```
 
-```bash
-npm install
-```
+2. **Install dependencies**
+   ```bash
+   npm install
+   ```
 
-### 3. Environment Configuration
+3. **Environment configuration**
+   
+   Create a `.env` file in the root directory:
+   ```env
+   MONGODB_URI=mongodb://localhost:27017/meetmogger-ai
+   JWT_SECRET=your_secure_jwt_secret_key
+   GEMINI_API_KEY=your_google_gemini_api_key
+   PORT=3001
+   NODE_ENV=development
+   ```
 
-Create a `.env` file in the root directory:
+4. **Start the application**
+   
+   Backend server:
+   ```bash
+   npm run server
+   ```
+   
+   Frontend development server:
+   ```bash
+   npm run dev
+   ```
 
-```env
-MONGODB_URI=mongodb://localhost:27017/meetmogger-ai
-JWT_SECRET=your_secure_jwt_secret
-GEMINI_API_KEY=your_gemini_api_key
-PORT=3001
-NODE_ENV=development
-```
+5. **Access the application**
+   - Frontend: http://localhost:3000
+   - Backend API: http://localhost:3001
+   - Health check: http://localhost:3001/api/health
 
-### 4. Start MongoDB
+## 📋 API Documentation
 
-**Option A: Local MongoDB**
-```bash
-# Ensure MongoDB service is running
-```
+### Authentication Endpoints
+- `POST /api/auth/register` - Create new user account
+- `POST /api/auth/login` - User login
+- `GET /api/auth/profile` - Get user profile (protected)
 
-**Option B: MongoDB Atlas**
-- Create a free cluster at https://www.mongodb.com/atlas
-- Copy the connection string
-- Replace MONGODB_URI in .env
+### System Endpoints
+- `GET /api/health` - Server health check
 
-### 5. Run the Application
-
-**Start Backend**
-```bash
-npm run server
-```
-
-**Start Frontend**
-```bash
-npm run dev
-```
-
-### 6. Access the Application
-
-- **Frontend**: http://localhost:3000
-- **Backend API**: http://localhost:3001
-- **Health Check**: http://localhost:3001/api/health
-
-## 🔐 Authentication
-
-- JWT-based authentication (7-day expiry)
-- Password hashing using bcrypt
-- Protected API routes
-- Secure environment-based configuration
-
-## 🌐 API Endpoints
-
-**Authentication**
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-
-**Health**
-- `GET /api/health`
-
-## 🗄️ Database Schema
+## 🗄 Database Schema
 
 ```javascript
 User {
-  name: String,
-  email: String,
-  password: String,
-  createdAt: Date
+  name: String (required),
+  email: String (required, unique),
+  password: String (required, hashed),
+  createdAt: Date,
+  updatedAt: Date
 }
 ```
 
-## 🧠 Architecture Overview
+## 🏗 Project Architecture
 
 ```
-React (Vite)
-     ↓
-Express API
-     ↓
-MongoDB Atlas
-     ↓
-Google Gemini AI
+Frontend (React/Vite)
+       ↓
+   Express API
+       ↓
+   MongoDB Database
+       ↓
+   Google Gemini AI
 ```
+
+## 🎯 Demo Mode vs Full Application
+
+**Demo Mode (GitHub Pages)**
+- Uses mock authentication and AI responses
+- No backend server required
+- Demonstrates UI/UX and core functionality
+- Perfect for showcasing the project concept
+
+**Full Application (Local/Production)**
+- Real MongoDB database integration
+- Actual Google Gemini AI processing
+- Secure JWT authentication
+- Complete end-to-end functionality
 
 ## 🤝 Contributing
 
 1. Fork the repository
-2. Create a new branch (`git checkout -b feature-name`)
-3. Commit changes (`git commit -m "Add feature"`)
-4. Push to branch (`git push origin feature-name`)
+2. Create a feature branch (`git checkout -b feature/new-feature`)
+3. Commit your changes (`git commit -m 'Add new feature'`)
+4. Push to the branch (`git push origin feature/new-feature`)
 5. Open a Pull Request
 
 ## 📄 License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
-## 👥 Authors
+## 👨‍💻 Development Team
 
-- **Pandi Harshan K** — https://github.com/Pandiharshan
-- **Mukesh Kumar**
-- **Sabarishwaran R**
+- **Pandi Harshan K** - Full Stack Developer - [GitHub](https://github.com/Pandiharshan)
+- **Mukesh Kumar** - Backend Developer
+- **Sabarishwaran R** - Frontend Developer
 
 ## 🙏 Acknowledgments
 
-- Google Gemini AI
-- MongoDB
-- React & Vite
-- Tailwind CSS
+- Google Gemini AI for natural language processing capabilities
+- MongoDB for database solutions
+- React and Vite communities for excellent development tools
+- Tailwind CSS for utility-first styling framework
 
-⭐ **Star this repository if you found it useful!**
+---
+
+*Built with modern web technologies and best practices for scalable, maintainable code.*
