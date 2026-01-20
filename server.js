@@ -132,6 +132,36 @@ app.get('/api/test', (req, res) => {
   });
 });
 
+// MongoDB connection test endpoint
+app.get('/api/db-test', async (req, res) => {
+  try {
+    const mongoose = require('mongoose');
+    const connectionState = mongoose.connection.readyState;
+    const states = {
+      0: 'disconnected',
+      1: 'connected',
+      2: 'connecting',
+      3: 'disconnecting'
+    };
+    
+    res.json({
+      mongodb: {
+        status: states[connectionState] || 'unknown',
+        readyState: connectionState,
+        host: mongoose.connection.host,
+        name: mongoose.connection.name
+      },
+      timestamp: new Date().toISOString()
+    });
+  } catch (error) {
+    res.status(500).json({
+      error: 'Database test failed',
+      message: error.message,
+      timestamp: new Date().toISOString()
+    });
+  }
+});
+
 // Protected route to verify token and get user profile
 app.get('/api/auth/profile', authenticateToken, async (req, res) => {
   try {

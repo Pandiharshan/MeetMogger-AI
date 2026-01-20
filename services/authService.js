@@ -8,9 +8,12 @@ const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-pro
 // Register a new user
 export const registerUser = async (credentials) => {
   try {
+    console.log('🔄 Starting user registration process...');
     await connectDB();
+    console.log('✅ MongoDB connection established');
 
     // Check if user already exists by email or name
+    console.log('🔍 Checking for existing user...');
     const existingUser = await User.findOne({ 
       $or: [
         { email: credentials.email },
@@ -19,6 +22,7 @@ export const registerUser = async (credentials) => {
     });
     
     if (existingUser) {
+      console.log('❌ User already exists');
       if (existingUser.email === credentials.email) {
         return {
           success: false,
@@ -33,10 +37,12 @@ export const registerUser = async (credentials) => {
       }
     }
 
+    console.log('🔐 Hashing password...');
     // Hash password
     const saltRounds = 12;
     const hashedPassword = await bcrypt.hash(credentials.password, saltRounds);
 
+    console.log('👤 Creating new user...');
     // Create new user
     const user = new User({
       email: credentials.email,
@@ -44,8 +50,11 @@ export const registerUser = async (credentials) => {
       name: credentials.name,
     });
 
+    console.log('💾 Saving user to database...');
     await user.save();
+    console.log('✅ User saved successfully');
 
+    console.log('🎫 Generating JWT token...');
     // Generate JWT token with complete user data
     const token = jwt.sign(
       { 
@@ -57,6 +66,7 @@ export const registerUser = async (credentials) => {
       { expiresIn: '7d' }
     );
 
+    console.log('✅ Registration completed successfully');
     return {
       success: true,
       message: 'User registered successfully',
@@ -68,7 +78,12 @@ export const registerUser = async (credentials) => {
       token,
     };
   } catch (error) {
-    console.error('Registration error:', error);
+    console.error('❌ Registration error details:', {
+      message: error.message,
+      code: error.code,
+      name: error.name,
+      stack: error.stack
+    });
     
     // Handle MongoDB duplicate key errors
     if (error.code === 11000) {
@@ -82,9 +97,18 @@ export const registerUser = async (credentials) => {
       };
     }
     
+    // Handle MongoDB connection errors
+    if (error.name === 'MongoParseError' || error.name === 'MongoNetworkError') {
+      console.error('❌ MongoDB connection issue:', error.message);
+      return {
+        success: false,
+        message: 'Database connection error. Please try again.',
+      };
+    }
+    
     return {
       success: false,
-      message: 'Registration failed. Please try again.',
+      message: `Registration failed: ${error.message}`,
     };
   }
 };
