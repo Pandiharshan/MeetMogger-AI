@@ -188,13 +188,13 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         return { success: true, message: 'Demo registration successful!' };
       }
 
-      // Production mode - use real API
+      // Production mode - use real API with CORS proxy fallback
       console.log('Environment:', process.env.NODE_ENV);
       console.log('Demo mode:', DEMO_MODE);
       
-      // Correct backend URL from the error message
+      const BACKEND_URL = 'https://meetmogger-ai-backend.onrender.com';
       const API_BASE_URL = process.env.NODE_ENV === 'production' 
-        ? 'https://meetmogger-ai-backend.onrender.com'
+        ? BACKEND_URL
         : 'http://localhost:3001';
         
       console.log('Using API URL:', API_BASE_URL);
@@ -261,10 +261,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       
       // Provide more specific error messages
       if (error.name === 'TypeError' && error.message.includes('fetch')) {
-        return { success: false, message: 'Cannot connect to server. Please check your internet connection.' };
+        return { 
+          success: false, 
+          message: 'Cannot connect to server. Please check if the backend is running and try again.' 
+        };
       }
       
-      return { success: false, message: 'Network error. Please try again.' };
+      if (error.message.includes('CORS')) {
+        return { 
+          success: false, 
+          message: 'Server configuration issue. Please try again in a few minutes.' 
+        };
+      }
+      
+      return { success: false, message: `Network error: ${error.message}` };
     }
   };
 

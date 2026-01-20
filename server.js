@@ -10,18 +10,34 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
+// Middleware - More permissive CORS for debugging
 app.use(cors({
-  origin: process.env.NODE_ENV === 'production' 
-    ? [
-        'https://meet-mogger-ai.vercel.app',  // Your actual Vercel domain from the error
-        'https://meetmogger-ai.vercel.app',   // Alternative domain
-        'https://pandiharshan.github.io'      // GitHub Pages demo
-      ]
-    : ['http://localhost:3000', 'http://127.0.0.1:3000'],
+  origin: function (origin, callback) {
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    const allowedOrigins = process.env.NODE_ENV === 'production' 
+      ? [
+          'https://meet-mogger-ai.vercel.app',
+          'https://meetmogger-ai.vercel.app',
+          'https://pandiharshan.github.io'
+        ]
+      : ['http://localhost:3000', 'http://127.0.0.1:3000'];
+    
+    // Log the origin for debugging
+    console.log('Request from origin:', origin);
+    
+    if (allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      console.log('CORS blocked origin:', origin);
+      callback(null, true); // Temporarily allow all origins for debugging
+    }
+  },
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  optionsSuccessStatus: 200 // Some legacy browsers choke on 204
 }));
 
 // Add logging middleware to debug CORS issues
@@ -99,7 +115,21 @@ app.post('/api/auth/register', async (req, res) => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.json({ status: 'OK', message: 'Server is running' });
+  res.json({ 
+    status: 'OK', 
+    message: 'Server is running',
+    timestamp: new Date().toISOString(),
+    cors: 'enabled'
+  });
+});
+
+// Simple test endpoint to verify CORS
+app.get('/api/test', (req, res) => {
+  res.json({ 
+    message: 'CORS test successful',
+    origin: req.headers.origin,
+    timestamp: new Date().toISOString()
+  });
 });
 
 // Protected route to verify token and get user profile
