@@ -14,16 +14,17 @@ MeetMogger AI is a full-stack web application that analyzes customer service cal
 
 > **Note:** The live demo runs in demo mode using mock data and simulated AI responses. No backend server or API keys are required for the demo experience.
 
-## 🖼️ Screenshots
+## 🖼 Screenshots
 
-### Home Page
-![Home Page](https://raw.githubusercontent.com/Pandiharshan/MeetMogger-AI/main/screenshots/home.png)
+### 🏠 Home Page
+![Home Page](https://raw.githubusercontent.com/Pandiharshan/MeetMogger-AI/main/Screenshots/home.png)
 
-### Login Page
-![Login Page](https://raw.githubusercontent.com/Pandiharshan/MeetMogger-AI/main/screenshots/login.png)
+### 🔐 Login Page
+![Login Page](https://raw.githubusercontent.com/Pandiharshan/MeetMogger-AI/main/Screenshots/login.png)
 
-### Analysis Dashboard
-![Analysis Dashboard](https://raw.githubusercontent.com/Pandiharshan/MeetMogger-AI/main/screenshots/analysis.png)
+### 📊 Analysis Dashboard
+![Analysis Dashboard](https://raw.githubusercontent.com/Pandiharshan/MeetMogger-AI/main/Screenshots/analysis.png)
+
 
 ## ⚡ Key Features
 
