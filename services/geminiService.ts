@@ -67,21 +67,55 @@ const analysisSchema = {
 };
 
 export const analyzeCallTranscript = async (transcript: string): Promise<AnalysisResult> => {
-  // Check if we're in demo mode (GitHub Pages)
-  const isGitHubPages = typeof window !== 'undefined' && 
-                       window.location.hostname === 'pandiharshan.github.io';
-  
-  // Return demo data if in demo mode or on GitHub Pages
-  if (DEMO_MODE || isGitHubPages) {
+  // Check if we're in demo mode (GitHub Pages only)
+  if (DEMO_MODE) {
+    console.log('📱 Demo mode: Using mock analysis data');
     // Simulate API delay for realistic demo experience
     await new Promise(resolve => setTimeout(resolve, 1500));
     return DEMO_ANALYSIS;
   }
 
-  // In production, this should call the backend API endpoint for analysis
-  // For now, return demo data until backend analysis endpoint is implemented
-  await new Promise(resolve => setTimeout(resolve, 1500));
-  return DEMO_ANALYSIS;
+  // Production mode: Call backend API for real Gemini analysis
+  console.log('🚀 Production mode: Calling backend for real Gemini analysis...');
+  
+  try {
+    const API_BASE_URL = process.env.NODE_ENV === 'production' 
+      ? 'https://meetmogger-ai-backend.onrender.com'
+      : 'http://localhost:3001';
+
+    const token = localStorage.getItem('authToken');
+    if (!token) {
+      throw new Error('Authentication token not found. Please log in.');
+    }
+
+    const response = await fetch(`${API_BASE_URL}/api/analyze`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify({ transcript }),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Analysis request failed');
+    }
+
+    const data = await response.json();
+    
+    if (!data.success) {
+      throw new Error(data.message || 'Analysis failed');
+    }
+
+    console.log('✅ Real Gemini analysis received from backend');
+    return data.analysis;
+
+  } catch (error) {
+    console.error("❌ Error calling backend analysis API:", error);
+    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
+    throw new Error(`Failed to analyze transcript: ${errorMessage}`);
+  }
 
   try {
     const prompt = `

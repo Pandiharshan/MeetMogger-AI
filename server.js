@@ -2,6 +2,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 import { loginUser, registerUser, authenticateToken, getUserById } from './services/authService.js';
+import { analyzeTranscript } from './services/backendGeminiService.js';
 
 // Load environment variables
 dotenv.config();
@@ -12,7 +13,7 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? [process.env.FRONTEND_URL, 'https://pandiharshan.github.io']
+    ? ['https://meet-mogger-ai.vercel.app', 'https://pandiharshan.github.io']
     : ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
@@ -115,6 +116,37 @@ app.get('/api/auth/profile', authenticateToken, async (req, res) => {
     res.status(500).json({ 
       success: false, 
       message: 'Internal server error' 
+    });
+  }
+});
+
+// Protected route for transcript analysis using Gemini API
+app.post('/api/analyze', authenticateToken, async (req, res) => {
+  try {
+    const { transcript } = req.body;
+
+    if (!transcript || typeof transcript !== 'string' || transcript.trim().length === 0) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Transcript is required and must be a non-empty string' 
+      });
+    }
+
+    console.log(`🧠 Analyzing transcript for user ${req.user.email}...`);
+    
+    const analysis = await analyzeTranscript(transcript);
+    
+    console.log('✅ Gemini API analysis completed successfully');
+    
+    res.json({ 
+      success: true, 
+      analysis 
+    });
+  } catch (error) {
+    console.error('Analysis API error:', error);
+    res.status(500).json({ 
+      success: false, 
+      message: 'Analysis failed. Please try again.' 
     });
   }
 });
