@@ -37,14 +37,52 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   // Check for existing token on mount
   useEffect(() => {
-    const storedToken = localStorage.getItem('authToken');
-    const storedUser = localStorage.getItem('user');
+    const validateToken = async () => {
+      const storedToken = localStorage.getItem('authToken');
+      const storedUser = localStorage.getItem('user');
+      
+      if (storedToken && storedUser) {
+        // In demo mode, just restore from localStorage
+        if (DEMO_MODE) {
+          setToken(storedToken);
+          setUser(JSON.parse(storedUser));
+          setIsLoading(false);
+          return;
+        }
+        
+        // In production, validate token with server
+        try {
+          const API_BASE_URL = process.env.NODE_ENV === 'production' 
+            ? window.location.origin 
+            : 'http://localhost:3001';
+            
+          const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+            headers: {
+              'Authorization': `Bearer ${storedToken}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (response.ok) {
+            const data = await response.json();
+            setToken(storedToken);
+            setUser(data.user);
+          } else {
+            // Token is invalid, clear storage
+            localStorage.removeItem('authToken');
+            localStorage.removeItem('user');
+          }
+        } catch (error) {
+          console.error('Token validation error:', error);
+          // Clear invalid token
+          localStorage.removeItem('authToken');
+          localStorage.removeItem('user');
+        }
+      }
+      setIsLoading(false);
+    };
     
-    if (storedToken && storedUser) {
-      setToken(storedToken);
-      setUser(JSON.parse(storedUser));
-    }
-    setIsLoading(false);
+    validateToken();
   }, []);
 
   const login = async (email: string, password: string): Promise<{ success: boolean; message: string }> => {
@@ -69,13 +107,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       // Production mode - use real API
-      const response = await fetch('http://localhost:3001/api/auth/login', {
+      const API_BASE_URL = process.env.NODE_ENV === 'production' 
+        ? window.location.origin 
+        : 'http://localhost:3001';
+        
+      const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ email, password }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, message: errorData.message || 'Login failed' };
+      }
 
       const data = await response.json();
 
@@ -111,13 +158,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       // Production mode - use real API
-      const response = await fetch('http://localhost:3001/api/auth/register', {
+      const API_BASE_URL = process.env.NODE_ENV === 'production' 
+        ? window.location.origin 
+        : 'http://localhost:3001';
+        
+      const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({ name, email, password }),
       });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        return { success: false, message: errorData.message || 'Registration failed' };
+      }
 
       const data = await response.json();
 

@@ -1,43 +1,7 @@
 import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
-import mongoose from 'mongoose';
-
-// MongoDB connection
-const connectDB = async () => {
-  try {
-    const MONGODB_URI = process.env.MONGODB_URI || 'mongodb://localhost:27017/meetmogger-ai';
-    await mongoose.connect(MONGODB_URI);
-    console.log('✅ MongoDB connected successfully');
-  } catch (error) {
-    console.error('❌ MongoDB connection error:', error);
-    throw error;
-  }
-};
-
-// User Schema
-const userSchema = new mongoose.Schema({
-  email: {
-    type: String,
-    required: [true, 'Email is required'],
-    unique: true,
-    lowercase: true,
-    trim: true,
-  },
-  password: {
-    type: String,
-    required: [true, 'Password is required'],
-    minlength: [6, 'Password must be at least 6 characters'],
-  },
-  name: {
-    type: String,
-    required: [true, 'Name is required'],
-    trim: true,
-  },
-}, {
-  timestamps: true,
-});
-
-const User = mongoose.models.User || mongoose.model('User', userSchema);
+import User from '../models/User.js';
+import connectDB from '../lib/mongodb.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key-change-this-in-production';
 
@@ -140,5 +104,51 @@ export const loginUser = async (credentials) => {
       success: false,
       message: 'Login failed. Please try again.',
     };
+  }
+};
+
+// Verify JWT token
+export const verifyToken = (token) => {
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    return decoded;
+  } catch (error) {
+    return null;
+  }
+};
+
+// Get user by ID
+export const getUserById = async (userId) => {
+  try {
+    await connectDB();
+    const user = await User.findById(userId).select('-password');
+    return user;
+  } catch (error) {
+    console.error('Get user error:', error);
+    return null;
+  }
+};
+
+// JWT Middleware for protected routes
+export const authenticateToken = (req, res, next) => {
+  const authHeader = req.headers['authorization'];
+  const token = authHeader && authHeader.split(' ')[1]; // Bearer TOKEN
+
+  if (!token) {
+    return res.status(401).json({ 
+      success: false, 
+      message: 'Access token required' 
+    });
+  }
+
+  try {
+    const decoded = jwt.verify(token, JWT_SECRET);
+    req.user = decoded;
+    next();
+  } catch (error) {
+    return res.status(403).json({ 
+      success: false, 
+      message: 'Invalid or expired token' 
+    });
   }
 };
