@@ -217,7 +217,7 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 - **Pandi Harshan K** - [@Pandiharshan](https://github.com/Pandiharshan)
 - **Mukesh Kumar** - [@MukeshKumar-17](https://github.com/MukeshKumar-17)
-
+- **Sabarishwaran R** - [@sabarishwaran7](https://github.com/sabarishwaran7)
 ## 🙏 Acknowledgments
 
 - Google Gemini AI for powerful language analysis
