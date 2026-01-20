@@ -6,7 +6,7 @@ MeetMogger AI is a full-stack web application that analyzes customer service cal
 
 ## 🌐 Live Demo
 
-**Demo URL:** https://pandiharshan.github.io/MeetMogger-AI/
+**Demo URL:** https://meet-mogger-ai.vercel.app/
 
 **Demo Credentials:**
 - Email: `demo@meetmogger.ai`
@@ -14,16 +14,16 @@ MeetMogger AI is a full-stack web application that analyzes customer service cal
 
 > **Note:** The live demo runs in demo mode using mock data and simulated AI responses. No backend server or API keys are required for the demo experience.
 
-## 📸 Screenshots
+## 🖼️ Screenshots
 
 ### Home Page
-![Home Page](screenshots/home.png)
+![Home Page](https://raw.githubusercontent.com/Pandiharshan/MeetMogger-AI/main/screenshots/home.png)
 
 ### Login Page
-![Login Page](screenshots/login.png)
+![Login Page](https://raw.githubusercontent.com/Pandiharshan/MeetMogger-AI/main/screenshots/login.png)
 
 ### Analysis Dashboard
-![Analysis Dashboard](screenshots/analysis.png)
+![Analysis Dashboard](https://raw.githubusercontent.com/Pandiharshan/MeetMogger-AI/main/screenshots/analysis.png)
 
 ## ⚡ Key Features
 
