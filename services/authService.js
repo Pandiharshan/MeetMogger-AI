@@ -10,13 +10,27 @@ export const registerUser = async (credentials) => {
   try {
     await connectDB();
 
-    // Check if user already exists
-    const existingUser = await User.findOne({ email: credentials.email });
+    // Check if user already exists by email or name
+    const existingUser = await User.findOne({ 
+      $or: [
+        { email: credentials.email },
+        { name: credentials.name }
+      ]
+    });
+    
     if (existingUser) {
-      return {
-        success: false,
-        message: 'User with this email already exists',
-      };
+      if (existingUser.email === credentials.email) {
+        return {
+          success: false,
+          message: 'User with this email already exists',
+        };
+      }
+      if (existingUser.name === credentials.name) {
+        return {
+          success: false,
+          message: 'Username is already taken',
+        };
+      }
     }
 
     // Hash password
@@ -32,9 +46,13 @@ export const registerUser = async (credentials) => {
 
     await user.save();
 
-    // Generate JWT token
+    // Generate JWT token with complete user data
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { 
+        userId: user._id, 
+        email: user.email,
+        name: user.name 
+      },
       JWT_SECRET,
       { expiresIn: '7d' }
     );
@@ -51,6 +69,19 @@ export const registerUser = async (credentials) => {
     };
   } catch (error) {
     console.error('Registration error:', error);
+    
+    // Handle MongoDB duplicate key errors
+    if (error.code === 11000) {
+      const field = Object.keys(error.keyPattern)[0];
+      const message = field === 'email' 
+        ? 'User with this email already exists'
+        : 'Username is already taken';
+      return {
+        success: false,
+        message,
+      };
+    }
+    
     return {
       success: false,
       message: 'Registration failed. Please try again.',
@@ -81,9 +112,13 @@ export const loginUser = async (credentials) => {
       };
     }
 
-    // Generate JWT token
+    // Generate JWT token with complete user data
     const token = jwt.sign(
-      { userId: user._id, email: user.email },
+      { 
+        userId: user._id, 
+        email: user.email,
+        name: user.name 
+      },
       JWT_SECRET,
       { expiresIn: '7d' }
     );

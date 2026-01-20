@@ -39,18 +39,20 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   useEffect(() => {
     const validateToken = async () => {
       const storedToken = localStorage.getItem('authToken');
-      const storedUser = localStorage.getItem('user');
       
-      if (storedToken && storedUser) {
-        // In demo mode, just restore from localStorage
+      if (storedToken) {
+        // In demo mode, restore from localStorage
         if (DEMO_MODE) {
-          setToken(storedToken);
-          setUser(JSON.parse(storedUser));
+          const storedUser = localStorage.getItem('user');
+          if (storedUser) {
+            setToken(storedToken);
+            setUser(JSON.parse(storedUser));
+          }
           setIsLoading(false);
           return;
         }
         
-        // In production, validate token with server
+        // In production, always validate token and fetch fresh user data
         try {
           const API_BASE_URL = process.env.NODE_ENV === 'production' 
             ? window.location.origin 
@@ -67,6 +69,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             const data = await response.json();
             setToken(storedToken);
             setUser(data.user);
+            // Update localStorage with fresh user data
+            localStorage.setItem('user', JSON.stringify(data.user));
           } else {
             // Token is invalid, clear storage
             localStorage.removeItem('authToken');
@@ -127,10 +131,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
 
       if (data.success) {
-        setUser(data.user);
+        // Store token first
         setToken(data.token);
         localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Fetch fresh user data from server to ensure consistency
+        try {
+          const profileResponse = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+            headers: {
+              'Authorization': `Bearer ${data.token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            setUser(profileData.user);
+            localStorage.setItem('user', JSON.stringify(profileData.user));
+          } else {
+            // Fallback to login response user data
+            setUser(data.user);
+            localStorage.setItem('user', JSON.stringify(data.user));
+          }
+        } catch (error) {
+          // Fallback to login response user data
+          setUser(data.user);
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        
         return { success: true, message: data.message };
       } else {
         return { success: false, message: data.message };
@@ -178,10 +206,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
 
       if (data.success) {
-        setUser(data.user);
+        // Store token first
         setToken(data.token);
         localStorage.setItem('authToken', data.token);
-        localStorage.setItem('user', JSON.stringify(data.user));
+        
+        // Fetch fresh user data from server to ensure consistency
+        try {
+          const profileResponse = await fetch(`${API_BASE_URL}/api/auth/profile`, {
+            headers: {
+              'Authorization': `Bearer ${data.token}`,
+              'Content-Type': 'application/json',
+            },
+          });
+          
+          if (profileResponse.ok) {
+            const profileData = await profileResponse.json();
+            setUser(profileData.user);
+            localStorage.setItem('user', JSON.stringify(profileData.user));
+          } else {
+            // Fallback to registration response user data
+            setUser(data.user);
+            localStorage.setItem('user', JSON.stringify(data.user));
+          }
+        } catch (error) {
+          // Fallback to registration response user data
+          setUser(data.user);
+          localStorage.setItem('user', JSON.stringify(data.user));
+        }
+        
         return { success: true, message: data.message };
       } else {
         return { success: false, message: data.message };

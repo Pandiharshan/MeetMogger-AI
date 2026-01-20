@@ -16,13 +16,15 @@ const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Name is required'],
+    unique: true,
     trim: true,
   },
 }, {
   timestamps: true,
 });
 
-// Create indexes
-UserSchema.index({ email: 1 });
+// Create indexes for uniqueness
+UserSchema.index({ email: 1 }, { unique: true });
+UserSchema.index({ name: 1 }, { unique: true });
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

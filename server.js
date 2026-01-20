@@ -71,7 +71,11 @@ app.post('/api/auth/register', async (req, res) => {
     if (result.success) {
       return res.status(201).json(result);
     } else {
-      return res.status(400).json(result);
+      // Return 409 for duplicate user errors
+      const isDuplicateError = result.message.includes('already exists') || 
+                              result.message.includes('already taken');
+      const statusCode = isDuplicateError ? 409 : 400;
+      return res.status(statusCode).json(result);
     }
   } catch (error) {
     console.error('Registration API error:', error);
