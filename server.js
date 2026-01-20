@@ -13,12 +13,22 @@ const PORT = process.env.PORT || 3001;
 // Middleware
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
-    ? ['https://meet-mogger-ai.vercel.app', 'https://pandiharshan.github.io']
+    ? [
+        'https://meet-mogger-ai.vercel.app',  // Your actual Vercel domain from the error
+        'https://meetmogger-ai.vercel.app',   // Alternative domain
+        'https://pandiharshan.github.io'      // GitHub Pages demo
+      ]
     : ['http://localhost:3000', 'http://127.0.0.1:3000'],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization']
 }));
+
+// Add logging middleware to debug CORS issues
+app.use((req, res, next) => {
+  console.log(`${req.method} ${req.path} - Origin: ${req.headers.origin}`);
+  next();
+});
 app.use(express.json());
 
 // API Routes

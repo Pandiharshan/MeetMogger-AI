@@ -189,9 +189,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
 
       // Production mode - use real API
+      console.log('Environment:', process.env.NODE_ENV);
+      console.log('Demo mode:', DEMO_MODE);
+      
+      // Correct backend URL from the error message
       const API_BASE_URL = process.env.NODE_ENV === 'production' 
         ? 'https://meetmogger-ai-backend.onrender.com'
         : 'http://localhost:3001';
+        
+      console.log('Using API URL:', API_BASE_URL);
         
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {
         method: 'POST',
@@ -201,8 +207,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         body: JSON.stringify({ name, email, password }),
       });
 
+      console.log('Registration response status:', response.status);
+      console.log('Registration response URL:', `${API_BASE_URL}/api/auth/register`);
+
       if (!response.ok) {
-        const errorData = await response.json();
+        const errorData = await response.json().catch(() => ({ message: `HTTP ${response.status}: ${response.statusText}` }));
+        console.error('Registration error response:', errorData);
         return { success: false, message: errorData.message || 'Registration failed' };
       }
 
@@ -243,6 +253,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       }
     } catch (error) {
       console.error('Registration error:', error);
+      console.error('Error details:', {
+        message: error.message,
+        stack: error.stack,
+        name: error.name
+      });
+      
+      // Provide more specific error messages
+      if (error.name === 'TypeError' && error.message.includes('fetch')) {
+        return { success: false, message: 'Cannot connect to server. Please check your internet connection.' };
+      }
+      
       return { success: false, message: 'Network error. Please try again.' };
     }
   };
