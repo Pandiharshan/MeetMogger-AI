@@ -1,9 +1,9 @@
 import { GoogleGenAI, Type } from '@google/genai';
 import type { AnalysisResult } from '../types';
+import { DEMO_MODE, DEMO_ANALYSIS } from '../demo-config.js';
 
-// Initialize the Google Gemini API client.
-// The API key is automatically sourced from the environment.
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
+// Initialize the Google Gemini API client only if not in demo mode
+const ai = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
 
 // Define the exact JSON structure we expect from the Gemini API.
 // This ensures the AI's response is always in a predictable, parseable format.
@@ -66,6 +66,13 @@ const analysisSchema = {
 };
 
 export const analyzeCallTranscript = async (transcript: string): Promise<AnalysisResult> => {
+  // Return demo data if in demo mode or no API key available
+  if (DEMO_MODE || !ai) {
+    // Simulate API delay for realistic demo experience
+    await new Promise(resolve => setTimeout(resolve, 1500));
+    return DEMO_ANALYSIS;
+  }
+
   try {
     const prompt = `
       Analyze the following transcribed call conversation.

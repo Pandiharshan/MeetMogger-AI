@@ -1,7 +1,7 @@
 // Demo configuration for GitHub Pages
 // This file provides mock data when running in demo mode
 
-export const DEMO_MODE = process.env.NODE_ENV === 'development' && process.env.DEMO_MODE === 'true';
+export const DEMO_MODE = !process.env.GEMINI_API_KEY || process.env.NODE_ENV !== 'development';
 
 export const DEMO_USERS = [
   {
