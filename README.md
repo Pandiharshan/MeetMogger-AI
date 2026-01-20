@@ -62,6 +62,20 @@ MeetMogger AI is a full-stack web application that analyzes customer service cal
 
 ## 🚀 Local Development Setup
 
+## 🏗 Deployment Architecture
+
+**Production Stack:**
+- **Frontend**: Vercel (React + Vite)
+- **Backend**: Render (Node.js + Express)
+- **Database**: MongoDB Atlas
+- **AI Engine**: Google Gemini API
+
+The application uses secure JWT-based authentication and real-time AI processing in production.
+
+A demo-only mode is enabled exclusively for GitHub Pages to allow recruiters to explore the UI without backend dependencies.
+
+## 🚀 Local Development Setup
+
 ### Prerequisites
 - Node.js (v16 or higher)
 - MongoDB (local installation or Atlas account)

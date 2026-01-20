@@ -1,7 +1,14 @@
-// Demo configuration for GitHub Pages
-// This file provides mock data when running in demo mode
-
-export const DEMO_MODE = !process.env.GEMINI_API_KEY || process.env.NODE_ENV !== 'development';
+// Demo mode configuration
+// Enable demo mode ONLY on GitHub Pages static deployment
+export const DEMO_MODE = (() => {
+  // Server-side rendering check
+  if (typeof window === 'undefined') {
+    return false;
+  }
+  
+  // Check if we're on GitHub Pages
+  return window.location.hostname === 'pandiharshan.github.io';
+})();
 
 export const DEMO_USERS = [
   {

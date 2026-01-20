@@ -55,7 +55,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         // In production, always validate token and fetch fresh user data
         try {
           const API_BASE_URL = process.env.NODE_ENV === 'production' 
-            ? window.location.origin 
+            ? 'https://meetmogger-ai-backend.onrender.com'
             : 'http://localhost:3001';
             
           const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
@@ -91,9 +91,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const login = async (email: string, password: string): Promise<{ success: boolean; message: string }> => {
     try {
-      // Demo mode - use mock authentication
+      // Demo mode - use mock authentication ONLY on GitHub Pages
       if (DEMO_MODE) {
-        const demoUser = DEMO_USERS.find(user => user.email === email && user.password === password);
+        const demoUser = DEMO_USERS.find(user => 
+          user.email.trim().toLowerCase() === email.trim().toLowerCase() && 
+          user.password === password
+        );
         if (demoUser) {
           const userData = {
             id: demoUser.id,
@@ -112,7 +115,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Production mode - use real API
       const API_BASE_URL = process.env.NODE_ENV === 'production' 
-        ? window.location.origin 
+        ? 'https://meetmogger-ai-backend.onrender.com'
         : 'http://localhost:3001';
         
       const response = await fetch(`${API_BASE_URL}/api/auth/login`, {
@@ -171,7 +174,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const register = async (name: string, email: string, password: string): Promise<{ success: boolean; message: string }> => {
     try {
-      // Demo mode - simulate registration
+      // Demo mode - simulate registration ONLY on GitHub Pages
       if (DEMO_MODE) {
         const userData = {
           id: `demo-user-${Date.now()}`,
@@ -187,7 +190,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       // Production mode - use real API
       const API_BASE_URL = process.env.NODE_ENV === 'production' 
-        ? window.location.origin 
+        ? 'https://meetmogger-ai-backend.onrender.com'
         : 'http://localhost:3001';
         
       const response = await fetch(`${API_BASE_URL}/api/auth/register`, {

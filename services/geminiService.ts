@@ -3,7 +3,8 @@ import type { AnalysisResult } from '../types';
 import { DEMO_MODE, DEMO_ANALYSIS } from '../demo-config.js';
 
 // Initialize the Google Gemini API client only if not in demo mode
-const ai = process.env.GEMINI_API_KEY ? new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY }) : null;
+// In production, this will be null on frontend (API key is backend-only)
+const ai = null; // Frontend should not have direct access to Gemini API
 
 // Define the exact JSON structure we expect from the Gemini API.
 // This ensures the AI's response is always in a predictable, parseable format.
@@ -66,12 +67,21 @@ const analysisSchema = {
 };
 
 export const analyzeCallTranscript = async (transcript: string): Promise<AnalysisResult> => {
-  // Return demo data if in demo mode or no API key available
-  if (DEMO_MODE || !ai) {
+  // Check if we're in demo mode (GitHub Pages)
+  const isGitHubPages = typeof window !== 'undefined' && 
+                       window.location.hostname === 'pandiharshan.github.io';
+  
+  // Return demo data if in demo mode or on GitHub Pages
+  if (DEMO_MODE || isGitHubPages) {
     // Simulate API delay for realistic demo experience
     await new Promise(resolve => setTimeout(resolve, 1500));
     return DEMO_ANALYSIS;
   }
+
+  // In production, this should call the backend API endpoint for analysis
+  // For now, return demo data until backend analysis endpoint is implemented
+  await new Promise(resolve => setTimeout(resolve, 1500));
+  return DEMO_ANALYSIS;
 
   try {
     const prompt = `
