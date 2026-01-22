@@ -1,7 +1,7 @@
-import { GoogleGenAI } from '@google/genai';
+import { GoogleGenerativeAI } from '@google/generative-ai';
 
 // Initialize the Google Gemini API client with backend API key
-const genAI = process.env.GEMINI_API_KEY ? new GoogleGenAI(process.env.GEMINI_API_KEY) : null;
+const genAI = process.env.GEMINI_API_KEY ? new GoogleGenerativeAI(process.env.GEMINI_API_KEY) : null;
 
 export const analyzeTranscript = async (transcript) => {
   console.log('🚀 === GEMINI SERVICE CALLED ===');
@@ -61,60 +61,21 @@ export const analyzeTranscript = async (transcript) => {
     console.log('📝 Prompt prepared, length:', prompt.length);
     console.log('📤 Sending request to Gemini API...');
     
-    // Use the correct API structure for @google/genai
-    // Use the correct model names with proper prefix and suffix for v1beta API
-    const modelNames = [
-      'models/gemini-1.5-flash-latest',  // Correct format with models/ prefix and -latest suffix
-      'models/gemini-1.5-pro-latest',    // Alternative with better quality
-    ];
-    
-    let result;
-    let lastError;
-    
-    for (const modelName of modelNames) {
-      try {
-        console.log('🤖 Attempting to use model:', modelName);
-        
-        result = await genAI.models.generateContent({
-          model: modelName,
-          contents: prompt,
-          config: {
-            responseMimeType: 'application/json'
-          }
-        });
-        
-        console.log('✅ Successfully used model:', modelName);
-        break; // Success, exit the loop
-        
-      } catch (modelError) {
-        console.log('❌ Model', modelName, 'failed:', modelError.message);
-        lastError = modelError;
-        continue; // Try next model
+    // Use the official @google/generative-ai package with correct API
+    const model = genAI.getGenerativeModel({ 
+      model: 'gemini-1.5-flash',
+      generationConfig: {
+        responseMimeType: 'application/json'
       }
-    }
+    });
     
-    if (!result) {
-      console.error('❌ All models failed, last error:', lastError);
-      throw lastError || new Error('All available models failed');
-    }
+    console.log('🤖 Model initialized:', model.model);
+    
+    const result = await model.generateContent(prompt);
+    const response = await result.response;
+    const jsonText = response.text();
     
     console.log('📥 Received result from Gemini API');
-    console.log('📊 Result type:', typeof result);
-    console.log('📊 Result keys:', Object.keys(result || {}));
-    
-    // Extract the response text
-    let jsonText;
-    if (result && result.response && typeof result.response.text === 'function') {
-      jsonText = result.response.text();
-    } else if (result && result.text) {
-      jsonText = result.text;
-    } else if (result && typeof result === 'string') {
-      jsonText = result;
-    } else {
-      console.error('❌ Unexpected result structure:', result);
-      throw new Error('Unexpected response structure from Gemini API');
-    }
-
     console.log('📄 Response text length:', jsonText?.length || 0);
     console.log('📄 Response text preview:', jsonText?.substring(0, 300) + '...');
 
