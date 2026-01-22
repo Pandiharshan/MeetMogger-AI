@@ -62,12 +62,10 @@ export const analyzeTranscript = async (transcript) => {
     console.log('📤 Sending request to Gemini API...');
     
     // Use the correct API structure for @google/genai
-    // Try different model names that are available in v1beta
+    // Use the correct model names with proper prefix and suffix for v1beta API
     const modelNames = [
-      'gemini-1.5-pro',
-      'gemini-1.5-flash',
-      'gemini-pro',
-      'gemini-1.0-pro'
+      'models/gemini-1.5-flash-latest',  // Correct format with models/ prefix and -latest suffix
+      'models/gemini-1.5-pro-latest',    // Alternative with better quality
     ];
     
     let result;
