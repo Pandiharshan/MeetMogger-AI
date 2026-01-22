@@ -30,6 +30,38 @@ export const analyzeTranscript = async (transcript) => {
   console.log('🚀 Calling Google Gemini API for real analysis...');
 
   try {
+    // First, discover available models
+    console.log('🔍 Discovering available models...');
+    let availableModels = [];
+    
+    try {
+      const { models } = await genAI.listModels();
+      console.log('📋 Found', models.length, 'total models');
+      
+      // Filter models that support generateContent
+      availableModels = models
+        .filter(model => model.supportedGenerationMethods.includes('generateContent'))
+        .map(model => model.name.replace('models/', '')); // Remove models/ prefix for usage
+      
+      console.log('✅ Available models that support generateContent:', availableModels);
+      
+    } catch (listError) {
+      console.log('⚠️ Could not list models:', listError.message);
+      console.log('⚠️ Will try common model names as fallback');
+      
+      // Fallback to common model names
+      availableModels = [
+        'gemini-pro',
+        'gemini-1.0-pro',
+        'text-bison-001',
+        'chat-bison-001'
+      ];
+    }
+    
+    if (availableModels.length === 0) {
+      throw new Error('No available models found that support generateContent');
+    }
+
     // Prepare the prompt
     const prompt = `
       Analyze the following transcribed call conversation.
@@ -59,19 +91,39 @@ export const analyzeTranscript = async (transcript) => {
     `;
 
     console.log('📝 Prompt prepared, length:', prompt.length);
-    console.log('📤 Sending request to Gemini API...');
+    console.log('📤 Trying available models...');
     
-    // Use the official @google/generative-ai package with correct API
-    const model = genAI.getGenerativeModel({ 
-      model: 'gemini-1.5-flash',
-      generationConfig: {
-        responseMimeType: 'application/json'
+    // Try each available model until one works
+    let result;
+    let lastError;
+    
+    for (const modelName of availableModels) {
+      try {
+        console.log('🤖 Attempting to use model:', modelName);
+        
+        const model = genAI.getGenerativeModel({ 
+          model: modelName,
+          generationConfig: {
+            responseMimeType: 'application/json'
+          }
+        });
+        
+        result = await model.generateContent(prompt);
+        console.log('✅ Successfully used model:', modelName);
+        break; // Success, exit the loop
+        
+      } catch (modelError) {
+        console.log('❌ Model', modelName, 'failed:', modelError.message);
+        lastError = modelError;
+        continue; // Try next model
       }
-    });
+    }
     
-    console.log('🤖 Model initialized:', model.model);
+    if (!result) {
+      console.error('❌ All models failed, last error:', lastError);
+      throw lastError || new Error('All available models failed');
+    }
     
-    const result = await model.generateContent(prompt);
     const response = await result.response;
     const jsonText = response.text();
     
