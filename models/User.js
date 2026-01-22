@@ -16,15 +16,12 @@ const UserSchema = new mongoose.Schema({
   name: {
     type: String,
     required: [true, 'Name is required'],
-    unique: true,
-    trim: true,
+    trim: true,  // Removed unique: true as names don't need to be unique
   },
 }, {
   timestamps: true,
 });
 
-// Ensure indexes are created only once
-UserSchema.index({ email: 1 }, { unique: true });
-UserSchema.index({ name: 1 }, { unique: true });
+// No need for additional indexes since unique: true already creates indexes
 
 export default mongoose.models.User || mongoose.model('User', UserSchema);

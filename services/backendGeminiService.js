@@ -62,13 +62,43 @@ export const analyzeTranscript = async (transcript) => {
     console.log('📤 Sending request to Gemini API...');
     
     // Use the correct API structure for @google/genai
-    const result = await genAI.models.generateContent({
-      model: 'gemini-1.5-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json'
+    // Try different model names that are available in v1beta
+    const modelNames = [
+      'gemini-1.5-pro',
+      'gemini-1.5-flash',
+      'gemini-pro',
+      'gemini-1.0-pro'
+    ];
+    
+    let result;
+    let lastError;
+    
+    for (const modelName of modelNames) {
+      try {
+        console.log('🤖 Attempting to use model:', modelName);
+        
+        result = await genAI.models.generateContent({
+          model: modelName,
+          contents: prompt,
+          config: {
+            responseMimeType: 'application/json'
+          }
+        });
+        
+        console.log('✅ Successfully used model:', modelName);
+        break; // Success, exit the loop
+        
+      } catch (modelError) {
+        console.log('❌ Model', modelName, 'failed:', modelError.message);
+        lastError = modelError;
+        continue; // Try next model
       }
-    });
+    }
+    
+    if (!result) {
+      console.error('❌ All models failed, last error:', lastError);
+      throw lastError || new Error('All available models failed');
+    }
     
     console.log('📥 Received result from Gemini API');
     console.log('📊 Result type:', typeof result);
