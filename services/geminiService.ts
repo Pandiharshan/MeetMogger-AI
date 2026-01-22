@@ -83,10 +83,16 @@ export const analyzeCallTranscript = async (transcript: string): Promise<Analysi
       ? 'https://meetmogger-ai-backend.onrender.com'
       : 'http://localhost:3001';
 
+    console.log('🌐 API Base URL:', API_BASE_URL);
+    console.log('🔍 Environment:', process.env.NODE_ENV);
+
     const token = localStorage.getItem('authToken');
     if (!token) {
       throw new Error('Authentication token not found. Please log in.');
     }
+
+    console.log('🔑 Token found:', !!token);
+    console.log('📝 Transcript length:', transcript.length);
 
     const response = await fetch(`${API_BASE_URL}/api/analyze`, {
       method: 'POST',
@@ -97,12 +103,35 @@ export const analyzeCallTranscript = async (transcript: string): Promise<Analysi
       body: JSON.stringify({ transcript }),
     });
 
+    console.log('📡 Response status:', response.status);
+    console.log('📡 Response ok:', response.ok);
+
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Analysis request failed');
+      let errorData;
+      try {
+        errorData = await response.json();
+      } catch (parseError) {
+        console.error('❌ Failed to parse error response:', parseError);
+        errorData = { 
+          message: `HTTP ${response.status}: ${response.statusText}`,
+          status: response.status,
+          statusText: response.statusText
+        };
+      }
+      
+      console.error('❌ API Error Response:', errorData);
+      console.error('❌ Response Headers:', Object.fromEntries(response.headers.entries()));
+      
+      // Log debug info if available
+      if (errorData.debug) {
+        console.error('🔍 Debug Info:', errorData.debug);
+      }
+      
+      throw new Error(errorData.message || `Analysis request failed with status ${response.status}`);
     }
 
     const data = await response.json();
+    console.log('📦 Response data:', data);
     
     if (!data.success) {
       throw new Error(data.message || 'Analysis failed');
@@ -115,43 +144,5 @@ export const analyzeCallTranscript = async (transcript: string): Promise<Analysi
     console.error("❌ Error calling backend analysis API:", error);
     const errorMessage = error instanceof Error ? error.message : "An unknown error occurred.";
     throw new Error(`Failed to analyze transcript: ${errorMessage}`);
-  }
-
-  try {
-    const prompt = `
-      Analyze the following transcribed call conversation.
-      Based on the content, provide a detailed analysis covering the call's theme, sentiment,
-      identified problems, proposed solutions, any action items, and a final summary.
-      Adhere strictly to the provided JSON schema for your response.
-
-      Transcript to analyze:
-      ---
-      ${transcript}
-      ---
-    `;
-
-    const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-        responseSchema: analysisSchema,
-      },
-    });
-
-    const jsonText = response.text;
-    if (!jsonText) {
-      throw new Error("Received an empty response from the Gemini API.");
-    }
-
-    // The response is already guaranteed to be a JSON string due to the config.
-    const result = JSON.parse(jsonText);
-    
-    return result as AnalysisResult;
-
-  } catch (error) {
-    console.error("Error analyzing transcript with Gemini API:", error);
-    const errorMessage = error instanceof Error ? error.message : "An unknown error occurred. Check the console for details.";
-    throw new Error(`Failed to get analysis from Gemini API. ${errorMessage}`);
   }
 };
