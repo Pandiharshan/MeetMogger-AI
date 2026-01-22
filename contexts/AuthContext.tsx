@@ -58,6 +58,9 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             ? 'https://meetmogger-ai-backend.onrender.com'
             : 'http://localhost:3001';
             
+          console.log('🔍 Validating token with API:', API_BASE_URL);
+          console.log('🔑 Token exists:', !!storedToken);
+            
           const response = await fetch(`${API_BASE_URL}/api/auth/profile`, {
             headers: {
               'Authorization': `Bearer ${storedToken}`,
@@ -65,13 +68,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             },
           });
           
+          console.log('📡 Profile API response status:', response.status);
+          
           if (response.ok) {
             const data = await response.json();
+            console.log('✅ Profile data received:', data);
             setToken(storedToken);
             setUser(data.user);
             // Update localStorage with fresh user data
             localStorage.setItem('user', JSON.stringify(data.user));
           } else {
+            console.log('❌ Profile API failed, clearing token');
             // Token is invalid, clear storage
             localStorage.removeItem('authToken');
             localStorage.removeItem('user');
@@ -134,12 +141,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const data = await response.json();
 
       if (data.success) {
+        console.log('🎉 Login successful, received data:', data);
+        
         // Store token first
         setToken(data.token);
         localStorage.setItem('authToken', data.token);
         
         // Fetch fresh user data from server to ensure consistency
         try {
+          console.log('🔄 Fetching fresh profile data after login...');
           const profileResponse = await fetch(`${API_BASE_URL}/api/auth/profile`, {
             headers: {
               'Authorization': `Bearer ${data.token}`,
@@ -147,16 +157,21 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             },
           });
           
+          console.log('📡 Post-login profile response status:', profileResponse.status);
+          
           if (profileResponse.ok) {
             const profileData = await profileResponse.json();
+            console.log('✅ Fresh profile data:', profileData);
             setUser(profileData.user);
             localStorage.setItem('user', JSON.stringify(profileData.user));
           } else {
+            console.log('⚠️ Profile fetch failed, using login data fallback');
             // Fallback to login response user data
             setUser(data.user);
             localStorage.setItem('user', JSON.stringify(data.user));
           }
         } catch (error) {
+          console.log('⚠️ Profile fetch error, using login data fallback:', error);
           // Fallback to login response user data
           setUser(data.user);
           localStorage.setItem('user', JSON.stringify(data.user));

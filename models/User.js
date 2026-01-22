@@ -23,7 +23,7 @@ const UserSchema = new mongoose.Schema({
   timestamps: true,
 });
 
-// Create indexes for uniqueness
+// Ensure indexes are created only once
 UserSchema.index({ email: 1 }, { unique: true });
 UserSchema.index({ name: 1 }, { unique: true });
 

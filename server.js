@@ -136,6 +136,11 @@ app.get('/api/test', (req, res) => {
 app.get('/api/db-test', async (req, res) => {
   try {
     const mongoose = require('mongoose');
+    const connectDB = require('./lib/mongodb.js').default;
+    
+    // Test the connection
+    await connectDB();
+    
     const connectionState = mongoose.connection.readyState;
     const states = {
       0: 'disconnected',
@@ -149,14 +154,17 @@ app.get('/api/db-test', async (req, res) => {
         status: states[connectionState] || 'unknown',
         readyState: connectionState,
         host: mongoose.connection.host,
-        name: mongoose.connection.name
+        name: mongoose.connection.name,
+        uri: process.env.MONGODB_URI ? process.env.MONGODB_URI.replace(/:[^:@]+@/, ':****@') : 'not set'
       },
       timestamp: new Date().toISOString()
     });
   } catch (error) {
     res.status(500).json({
-      error: 'Database test failed',
+      error: 'Database connection failed',
       message: error.message,
+      code: error.code,
+      name: error.name,
       timestamp: new Date().toISOString()
     });
   }
